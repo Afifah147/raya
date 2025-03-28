@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selamat Idul Fitri 2025</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(to bottom, #028f76, #8fd694);
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+            color: white;
+            text-align: center;
+            position: relative;
+        }
+        .circle {
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+            border: 10px solid gold;
+            box-shadow: 0 0 20px gold;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .marquee {
+            position: absolute;
+            white-space: nowrap;
+            color: gold;
+            font-size: 2em;
+            font-weight: bold;
+            animation: marquee 10s linear infinite;
+        }
+        @keyframes marquee {
+            from { transform: translateX(100%); }
+            to { transform: translateX(-100%); }
+        }
+        .fireworks {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+        }
+        .ketupat {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            animation: rotateKetupat 5s linear infinite;
+        }
+        .ketupat.left {
+            top: 20px;
+            left: 20px;
+        }
+        .ketupat.right {
+            top: 20px;
+            right: 20px;
+        }
+        @keyframes rotateKetupat {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .masjid {
+    position: absolute;
+    bottom: -50px;
+    left: -50px;
+    width: 450px; /* 5 kali lebih besar dari sebelumnya */
+    opacity: 0.8;
+}
+#playMusic {
+    position: absolute;
+    bottom: 20px; /* Mengatur posisi di bawah lingkaran */
+    left: 50%;
+    transform: translateX(-50%); /* Menengahkan tombol */
+    padding: 12px 20px;
+    background-color: gold;
+    color: #028f76;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.2em;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+#playMusic:hover {
+    background-color: #ffd700;
+    transform: translateX(-50%) scale(1.1);
+}
+.hidden {
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+}
+.visible {
+    opacity: 1;
+}
+
+
+    </style>
+</head>
+<body>
+    <audio id="backgroundMusic" src="takbir.mp3" autoplay muted></audio>
+    <canvas class="fireworks" id="fireworksCanvas"></canvas>
+    <img src="ketupat.png" alt="Ketupat" class="ketupat left hidden">
+    <img src="ketupat.png" alt="Ketupat" class="ketupat right hidden">
+    <div class="circle hidden">
+        <div class="marquee">Selamat Hari Raya Idul Fitri 1 Syawal 1446 H - Mohon Maaf Lahir dan Batin</div>
+    </div>
+    <img src="masjid.png" alt="Masjid" class="masjid hidden">
+<button id="playMusic">Putar Takbir 🎶</button>
+
+    <script>
+        const canvas = document.getElementById("fireworksCanvas");
+        const ctx = canvas.getContext("2d");
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        class Particle {
+            constructor(x, y, color, speed, angle) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                this.speed = speed;
+                this.angle = angle;
+                this.alpha = 1;
+            }
+            update() {
+                this.x += this.speed * Math.cos(this.angle);
+                this.y += this.speed * Math.sin(this.angle);
+                this.speed *= 0.98;
+                this.alpha -= 0.02;
+            }
+            draw() {
+                ctx.globalAlpha = this.alpha;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, 3, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+            }
+        }
+        class Firework {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.color = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                this.particles = [];
+                for (let i = 0; i < 50; i++) {
+                    this.particles.push(new Particle(x, y, this.color, Math.random() * 5 + 2, Math.random() * Math.PI * 2));
+                }
+            }
+            update() {
+                this.particles.forEach(p => p.update());
+                this.particles = this.particles.filter(p => p.alpha > 0);
+            }
+            draw() {
+                this.particles.forEach(p => p.draw());
+            }
+        }
+        let fireworks = [];
+        function animateFireworks() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            fireworks = fireworks.filter(f => f.particles.length > 0);
+            fireworks.forEach(firework => {
+                firework.update();
+                firework.draw();
+            });
+            if (Math.random() < 0.2) {
+                fireworks.push(new Firework(Math.random() * canvas.width, Math.random() * canvas.height * 0.5));
+            }
+            requestAnimationFrame(animateFireworks);
+        }
+        animateFireworks();
+        document.body.addEventListener("click", function () {
+            const audio = document.getElementById("backgroundMusic");
+            audio.muted = false;
+            audio.play();
+        }, { once: true });
+        document.getElementById("playMusic").addEventListener("click", function () {
+    const audio = document.getElementById("backgroundMusic");
+    audio.muted = false;
+    audio.play();
+    this.style.display = "none"; // Hilangkan tombol setelah diklik
+});
+document.getElementById("playMusic").addEventListener("click", function () {
+    const audio = document.getElementById("backgroundMusic");
+    audio.muted = false;
+    audio.play();
+    this.style.display = "none"; // Hilangkan tombol setelah diklik
+
+    // Tampilkan semua elemen yang tersembunyi
+    document.querySelectorAll(".hidden").forEach(el => {
+        el.classList.add("visible");
+    });
+});
+
+    </script>
+</body>
+</html>
